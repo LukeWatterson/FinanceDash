@@ -32,4 +32,5 @@ bin/
 ### FinanceDash ###
 .csv
 .sqlite
+.db
 

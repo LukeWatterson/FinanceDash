@@ -29,7 +29,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-### FinanceDash ###
+### FinanceDash.FinanceDash ###
 .csv
 .sqlite
 .db

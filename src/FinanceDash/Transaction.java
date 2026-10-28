@@ -46,22 +46,22 @@ public class Transaction {
         this.description = description;
         this.category = category;
 
-        if (paidOut.isEmpty()){
+        if (paidOut == null || paidOut.trim().isEmpty()){
             this.paidOut = 0;
         } else {
-            paidOut = paidOut.replace("£", "");
+            paidOut = paidOut.replace("£", "").trim();
             this.paidOut = Double.parseDouble(paidOut);
         }
-        if(paidIn.isEmpty()){
+        if(paidIn == null || paidIn.trim().isEmpty()){
             this.paidIn = 0;
         } else {
-            paidIn = paidIn.replace("£", "");
+            paidIn = paidIn.replace("£", "").trim();
             this.paidIn = Double.parseDouble(paidIn);
         }
-        if(balance.isEmpty()){
+        if(balance == null || balance.trim().isEmpty()){
             this.balance = 0;
         } else{
-            balance = balance.replace("£", "");
+            balance = balance.replace("£", "").trim();
             this.balance = Double.parseDouble(balance);
         }
     }

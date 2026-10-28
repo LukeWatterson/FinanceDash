@@ -7,7 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class DBM {
 
@@ -80,20 +83,8 @@ public class DBM {
      */
     public static void createTransactionsTable(String dbName) {
         String url = "jdbc:sqlite:" + dbName;
-        String sql = "CREATE TABLE IF NOT EXISTS transactions (\n"
-                + "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
-                + "    date TEXT,\n"
-                + "    description TEXT,\n"
-                + "    paid_out REAL,\n"
-                + "    paid_in REAL,\n"
-                + "    balance REAL,\n"
-                + "    category TEXT\n"
-                + ");";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-            System.out.println("Table 'transactions' is ready (created if it did not exist).");
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createTransactionsTable(conn);
         } catch (SQLException e) {
             System.err.println("Error creating table: " + e.getMessage());
         }
@@ -101,10 +92,14 @@ public class DBM {
 
     /**
      * Creates the 'transactions' table using an existing Connection.
+     * Also verifies that existing tables have all required columns and migrates older schemas if needed.
      *
      * @param conn existing database connection
      */
     public static void createTransactionsTable(Connection conn) {
+        if (conn == null) {
+            return;
+        }
         String sql = "CREATE TABLE IF NOT EXISTS transactions (\n"
                 + "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                 + "    date TEXT,\n"
@@ -118,8 +113,40 @@ public class DBM {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
             System.out.println("Table 'transactions' is ready (created if it did not exist).");
+
+            // Migration / schema check: ensure all expected columns exist in an already existing table
+            Set<String> columns = new HashSet<>();
+            try (ResultSet rs = stmt.executeQuery("PRAGMA table_info(transactions);")) {
+                while (rs.next()) {
+                    columns.add(rs.getString("name").toLowerCase());
+                }
+            }
+
+            if (!columns.contains("paid_out")) {
+                stmt.execute("ALTER TABLE transactions ADD COLUMN paid_out REAL DEFAULT 0;");
+            }
+            if (!columns.contains("paid_in")) {
+                stmt.execute("ALTER TABLE transactions ADD COLUMN paid_in REAL DEFAULT 0;");
+            }
+            if (!columns.contains("balance")) {
+                stmt.execute("ALTER TABLE transactions ADD COLUMN balance REAL DEFAULT 0;");
+            }
+            if (!columns.contains("category")) {
+                stmt.execute("ALTER TABLE transactions ADD COLUMN category TEXT;");
+            }
+            if (!columns.contains("date")) {
+                stmt.execute("ALTER TABLE transactions ADD COLUMN date TEXT;");
+            }
+            if (!columns.contains("description")) {
+                stmt.execute("ALTER TABLE transactions ADD COLUMN description TEXT;");
+            }
+
+            if (columns.contains("amount")) {
+                stmt.execute("UPDATE transactions SET paid_out = -amount WHERE amount < 0 AND (paid_out IS NULL OR paid_out = 0) AND (paid_in IS NULL OR paid_in = 0);");
+                stmt.execute("UPDATE transactions SET paid_in = amount WHERE amount > 0 AND (paid_out IS NULL OR paid_out = 0) AND (paid_in IS NULL OR paid_in = 0);");
+            }
         } catch (SQLException e) {
-            System.err.println("Error creating table: " + e.getMessage());
+            System.err.println("Error creating or updating table: " + e.getMessage());
         }
     }
 
@@ -574,6 +601,84 @@ public class DBM {
      */
     public static void readAndInsertCSV(String csvFilePath, String dbName) {
         insertFromCSV(csvFilePath, dbName);
+    }
+
+    /**
+     * Retrieves all transactions from the default database.
+     *
+     * @return a list of all transactions
+     */
+    public static List<Transaction> getAllTransactions() {
+        return getAllTransactions(DEFAULT_DB_NAME);
+    }
+
+    /**
+     * Retrieves all transactions from the specified database.
+     *
+     * @param dbName database file name or path
+     * @return a list of all transactions
+     */
+    public static List<Transaction> getAllTransactions(String dbName) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createTransactionsTable(conn);
+            return getAllTransactions(conn);
+        } catch (SQLException e) {
+            System.err.println("Error connecting or retrieving transactions: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves all transactions using an existing database connection.
+     *
+     * @param conn existing database connection
+     * @return a list of all transactions
+     */
+    public static List<Transaction> getAllTransactions(Connection conn) {
+        List<Transaction> transactions = new ArrayList<>();
+        if (conn == null) {
+            return transactions;
+        }
+        createTransactionsTable(conn);
+        String sql = "SELECT date, description, paid_out, paid_in, balance, category FROM transactions ORDER BY id ASC;";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String date = rs.getString("date");
+                String description = rs.getString("description");
+                double paidOut = rs.getDouble("paid_out");
+                double paidIn = rs.getDouble("paid_in");
+                double balance = rs.getDouble("balance");
+                String category = rs.getString("category");
+
+                String paidOutStr = paidOut > 0 ? String.format(Locale.ENGLISH, "%.2f", paidOut) : "";
+                String paidInStr = paidIn > 0 ? String.format(Locale.ENGLISH, "%.2f", paidIn) : "";
+                String balanceStr = String.format(Locale.ENGLISH, "%.2f", balance);
+
+                // Determine type from category or default
+                String typeStr = "Contactless Payment";
+                if (category != null && !category.isEmpty()) {
+                    try {
+                        Type parsedType = Type.fromString(category);
+                        typeStr = parsedType.toString();
+                    } catch (IllegalArgumentException ignored) {
+                        typeStr = category;
+                    }
+                }
+
+                Transaction tx;
+                try {
+                    tx = new Transaction(date, typeStr, description, paidOutStr, paidInStr, balanceStr, category);
+                } catch (IllegalArgumentException e) {
+                    tx = new Transaction(date, "Contactless Payment", description, paidOutStr, paidInStr, balanceStr, category);
+                }
+                transactions.add(tx);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error reading transactions: " + e.getMessage());
+        }
+        return transactions;
     }
 
     /**

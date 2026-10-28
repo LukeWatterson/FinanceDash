@@ -56,6 +56,7 @@ public class FinanceDash extends JFrame {
      * Displays the main application dashboard panel.
      */
     public void showMainPanel() {
+        mainPanel.loadTransactions();
         cardLayout.show(cardPanel, MAIN_PANEL_KEY);
     }
 

@@ -124,20 +124,105 @@ public class DBM {
     }
 
     /**
-     * Initializes the database: creates the database and the 'transactions' table if they do not exist.
+     * Creates the 'categories' table if it does not already exist in the default database.
+     */
+    public static void createCategoriesTable() {
+        createCategoriesTable(DEFAULT_DB_NAME);
+    }
+
+    /**
+     * Creates the 'categories' table if it does not already exist in the specified database.
+     *
+     * @param dbName database file name or path
+     */
+    public static void createCategoriesTable(String dbName) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+            createCategoriesTable(conn);
+        } catch (SQLException e) {
+            System.err.println("Error creating categories table: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates the 'categories' table using an existing Connection.
+     *
+     * @param conn existing database connection
+     */
+    public static void createCategoriesTable(Connection conn) {
+        String sql = "CREATE TABLE IF NOT EXISTS categories (\n"
+                + "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                + "    name TEXT UNIQUE NOT NULL,\n"
+                + "    monthly_max REAL NOT NULL\n"
+                + ");";
+
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Table 'categories' is ready (created if it did not exist).");
+        } catch (SQLException e) {
+            System.err.println("Error creating categories table: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates the 'settings' table if it does not already exist in the default database.
+     */
+    public static void createSettingsTable() {
+        createSettingsTable(DEFAULT_DB_NAME);
+    }
+
+    /**
+     * Creates the 'settings' table if it does not already exist in the specified database.
+     *
+     * @param dbName database file name or path
+     */
+    public static void createSettingsTable(String dbName) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+            createSettingsTable(conn);
+        } catch (SQLException e) {
+            System.err.println("Error creating settings table: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates the 'settings' table using an existing Connection.
+     *
+     * @param conn existing database connection
+     */
+    public static void createSettingsTable(Connection conn) {
+        String sql = "CREATE TABLE IF NOT EXISTS settings (\n"
+                + "    key TEXT PRIMARY KEY,\n"
+                + "    value TEXT\n"
+                + ");";
+
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Table 'settings' is ready (created if it did not exist).");
+        } catch (SQLException e) {
+            System.err.println("Error creating settings table: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Initializes the database: creates the database and all required tables if they do not exist.
      */
     public static void initializeDatabase() {
         initializeDatabase(DEFAULT_DB_NAME);
     }
 
     /**
-     * Initializes the specified database: creates the database and the 'transactions' table if they do not exist.
+     * Initializes the specified database: creates the database and required tables if they do not exist.
      *
      * @param dbName database file name or path
      */
     public static void initializeDatabase(String dbName) {
         createNewDatabase(dbName);
         createTransactionsTable(dbName);
+        createCategoriesTable(dbName);
+        createSettingsTable(dbName);
     }
 
     /**
@@ -287,7 +372,8 @@ public class DBM {
             pstmt.setDouble(3, transaction.getPaidOut());
             pstmt.setDouble(4, transaction.getPaidIn());
             pstmt.setDouble(5, transaction.getBalance());
-            pstmt.setString(6, transaction.getType() != null ? transaction.getType().toString() : null);
+            String cat = transaction.getCategory() != null ? transaction.getCategory().getName() : (transaction.getType() != null ? transaction.getType().toString() : null);
+            pstmt.setString(6, cat);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error inserting transaction: " + e.getMessage());
@@ -410,7 +496,8 @@ public class DBM {
                     pstmt.setDouble(3, transaction.getPaidOut());
                     pstmt.setDouble(4, transaction.getPaidIn());
                     pstmt.setDouble(5, transaction.getBalance());
-                    pstmt.setString(6, transaction.getType() != null ? transaction.getType().toString() : null);
+                    String cat = transaction.getCategory() != null ? transaction.getCategory().getName() : (transaction.getType() != null ? transaction.getType().toString() : null);
+                    pstmt.setString(6, cat);
                     pstmt.addBatch();
                 }
                 pstmt.executeBatch();
@@ -487,6 +574,315 @@ public class DBM {
      */
     public static void readAndInsertCSV(String csvFilePath, String dbName) {
         insertFromCSV(csvFilePath, dbName);
+    }
+
+    /**
+     * Inserts or updates a budget category in the default database.
+     *
+     * @param category the category to insert or update
+     */
+    public static void insertCategory(Category category) {
+        insertCategory(DEFAULT_DB_NAME, category);
+    }
+
+    /**
+     * Inserts or updates a budget category with the specified name and monthly maximum amount in the default database.
+     *
+     * @param name             the category name
+     * @param monthlyMaxAmount the monthly maximum budget
+     */
+    public static void insertCategory(String name, double monthlyMaxAmount) {
+        insertCategory(DEFAULT_DB_NAME, new Category(name, monthlyMaxAmount));
+    }
+
+    /**
+     * Inserts or updates a budget category with the specified name and monthly maximum amount in the specified database.
+     *
+     * @param dbName           database file name or path
+     * @param name             the category name
+     * @param monthlyMaxAmount the monthly maximum budget
+     */
+    public static void insertCategory(String dbName, String name, double monthlyMaxAmount) {
+        insertCategory(dbName, new Category(name, monthlyMaxAmount));
+    }
+
+    /**
+     * Inserts or updates a budget category in the specified database.
+     *
+     * @param dbName   database file name or path
+     * @param category the category to insert or update
+     */
+    public static void insertCategory(String dbName, Category category) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createCategoriesTable(conn);
+            insertCategory(conn, category);
+        } catch (SQLException e) {
+            System.err.println("Error connecting or inserting category: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Inserts or updates a budget category using an existing database connection.
+     *
+     * @param conn     existing database connection
+     * @param category the category to insert or update
+     */
+    public static void insertCategory(Connection conn, Category category) {
+        if (conn == null || category == null) {
+            return;
+        }
+        String sql = "INSERT INTO categories (name, monthly_max) VALUES (?, ?) "
+                + "ON CONFLICT(name) DO UPDATE SET monthly_max=excluded.monthly_max;";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, category.getName());
+            pstmt.setDouble(2, category.getMonthlyMaxAmount());
+            pstmt.executeUpdate();
+            System.out.println("Category saved: " + category.getName());
+        } catch (SQLException e) {
+            System.err.println("Error inserting category: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves all budget categories from the default database.
+     *
+     * @return a list of all budget categories
+     */
+    public static List<Category> getAllCategories() {
+        return getAllCategories(DEFAULT_DB_NAME);
+    }
+
+    /**
+     * Retrieves all budget categories from the specified database.
+     *
+     * @param dbName database file name or path
+     * @return a list of all budget categories
+     */
+    public static List<Category> getAllCategories(String dbName) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createCategoriesTable(conn);
+            return getAllCategories(conn);
+        } catch (SQLException e) {
+            System.err.println("Error connecting or retrieving categories: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves all budget categories using an existing database connection.
+     *
+     * @param conn existing database connection
+     * @return a list of all budget categories
+     */
+    public static List<Category> getAllCategories(Connection conn) {
+        List<Category> categories = new ArrayList<>();
+        if (conn == null) {
+            return categories;
+        }
+        String sql = "SELECT name, monthly_max FROM categories ORDER BY name ASC;";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String name = rs.getString("name");
+                double monthlyMax = rs.getDouble("monthly_max");
+                categories.add(new Category(name, monthlyMax));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error reading categories: " + e.getMessage());
+        }
+        return categories;
+    }
+
+    /**
+     * Deletes a budget category by name from the default database.
+     *
+     * @param name the category name to delete
+     */
+    public static void deleteCategory(String name) {
+        deleteCategory(DEFAULT_DB_NAME, name);
+    }
+
+    /**
+     * Deletes a budget category by name from the specified database.
+     *
+     * @param dbName database file name or path
+     * @param name   the category name to delete
+     */
+    public static void deleteCategory(String dbName, String name) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createCategoriesTable(conn);
+            deleteCategory(conn, name);
+        } catch (SQLException e) {
+            System.err.println("Error deleting category: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Deletes a budget category by name using an existing database connection.
+     *
+     * @param conn existing database connection
+     * @param name the category name to delete
+     */
+    public static void deleteCategory(Connection conn, String name) {
+        if (conn == null || name == null) {
+            return;
+        }
+        String sql = "DELETE FROM categories WHERE LOWER(name) = LOWER(?);";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.executeUpdate();
+            System.out.println("Category deleted: " + name);
+        } catch (SQLException e) {
+            System.err.println("Error deleting category: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves a setting value by key from the default database.
+     *
+     * @param key setting key
+     * @return setting value, or null if not found
+     */
+    public static String getSetting(String key) {
+        return getSetting(DEFAULT_DB_NAME, key);
+    }
+
+    /**
+     * Retrieves a setting value by key from the specified database.
+     *
+     * @param dbName database file name or path
+     * @param key    setting key
+     * @return setting value, or null if not found
+     */
+    public static String getSetting(String dbName, String key) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createSettingsTable(conn);
+            return getSetting(conn, key);
+        } catch (SQLException e) {
+            System.err.println("Error getting setting: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a setting value by key using an existing database connection.
+     *
+     * @param conn existing database connection
+     * @param key  setting key
+     * @return setting value, or null if not found
+     */
+    public static String getSetting(Connection conn, String key) {
+        if (conn == null || key == null) {
+            return null;
+        }
+        String sql = "SELECT value FROM settings WHERE key = ?;";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, key);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("value");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error reading setting: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Sets a setting key-value pair in the default database.
+     *
+     * @param key   setting key
+     * @param value setting value
+     */
+    public static void setSetting(String key, String value) {
+        setSetting(DEFAULT_DB_NAME, key, value);
+    }
+
+    /**
+     * Sets a setting key-value pair in the specified database.
+     *
+     * @param dbName database file name or path
+     * @param key    setting key
+     * @param value  setting value
+     */
+    public static void setSetting(String dbName, String key, String value) {
+        String url = "jdbc:sqlite:" + dbName;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            createSettingsTable(conn);
+            setSetting(conn, key, value);
+        } catch (SQLException e) {
+            System.err.println("Error setting value: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Sets a setting key-value pair using an existing database connection.
+     *
+     * @param conn  existing database connection
+     * @param key   setting key
+     * @param value setting value
+     */
+    public static void setSetting(Connection conn, String key, String value) {
+        if (conn == null || key == null) {
+            return;
+        }
+        String sql = "INSERT INTO settings (key, value) VALUES (?, ?) "
+                + "ON CONFLICT(key) DO UPDATE SET value=excluded.value;";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, key);
+            pstmt.setString(2, value);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error writing setting: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Checks if this is the first launch of the program in the default database.
+     *
+     * @return true if first launch completed is not set or categories are empty, false otherwise
+     */
+    public static boolean isFirstLaunch() {
+        return isFirstLaunch(DEFAULT_DB_NAME);
+    }
+
+    /**
+     * Checks if this is the first launch of the program in the specified database.
+     *
+     * @param dbName database file name or path
+     * @return true if first launch completed is not set or categories are empty, false otherwise
+     */
+    public static boolean isFirstLaunch(String dbName) {
+        String val = getSetting(dbName, "first_launch_completed");
+        if ("true".equalsIgnoreCase(val)) {
+            return false;
+        }
+        List<Category> categories = getAllCategories(dbName);
+        return categories.isEmpty();
+    }
+
+    /**
+     * Sets whether first launch has been completed in the default database.
+     *
+     * @param completed true if first launch is complete
+     */
+    public static void setFirstLaunchCompleted(boolean completed) {
+        setFirstLaunchCompleted(DEFAULT_DB_NAME, completed);
+    }
+
+    /**
+     * Sets whether first launch has been completed in the specified database.
+     *
+     * @param dbName    database file name or path
+     * @param completed true if first launch is complete
+     */
+    public static void setFirstLaunchCompleted(String dbName, boolean completed) {
+        setSetting(dbName, "first_launch_completed", String.valueOf(completed));
     }
 
     /**

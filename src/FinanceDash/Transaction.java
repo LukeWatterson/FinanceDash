@@ -11,6 +11,7 @@ public class Transaction {
     private double paidOut;
     private double paidIn;
     private double balance;
+    private Category category;
 
     /**
      * Constructs a new {@code Transaction} with the specified details.
@@ -25,9 +26,25 @@ public class Transaction {
      * @param balance     the account balance after the transaction, formatted as a string
      */
     public Transaction(String date, String type, String description, String paidOut, String paidIn, String balance) {
+        this(date, type, description, paidOut, paidIn, balance, (Category) null);
+    }
+
+    /**
+     * Constructs a new {@code Transaction} with the specified details including a budget category.
+     *
+     * @param date        the date of the transaction
+     * @param type        the string representation of the transaction type
+     * @param description the description or narrative of the transaction
+     * @param paidOut     the amount paid out, formatted as a string (e.g., "£10.50" or "")
+     * @param paidIn      the amount paid in, formatted as a string (e.g., "£100.00" or "")
+     * @param balance     the account balance after the transaction, formatted as a string
+     * @param category    the budget category assigned to this transaction
+     */
+    public Transaction(String date, String type, String description, String paidOut, String paidIn, String balance, Category category) {
         this.date = date;
         this.type = Type.fromString(type);
         this.description = description;
+        this.category = category;
 
         if (paidOut.isEmpty()){
             this.paidOut = 0;
@@ -47,6 +64,21 @@ public class Transaction {
             balance = balance.replace("£", "");
             this.balance = Double.parseDouble(balance);
         }
+    }
+
+    /**
+     * Constructs a new {@code Transaction} with the specified details including a budget category name.
+     *
+     * @param date         the date of the transaction
+     * @param type         the string representation of the transaction type
+     * @param description  the description or narrative of the transaction
+     * @param paidOut      the amount paid out, formatted as a string (e.g., "£10.50" or "")
+     * @param paidIn       the amount paid in, formatted as a string (e.g., "£100.00" or "")
+     * @param balance      the account balance after the transaction, formatted as a string
+     * @param categoryName the name of the budget category
+     */
+    public Transaction(String date, String type, String description, String paidOut, String paidIn, String balance, String categoryName) {
+        this(date, type, description, paidOut, paidIn, balance, categoryName != null ? new Category(categoryName, 0.0) : null);
     }
 
     /**
@@ -101,6 +133,33 @@ public class Transaction {
      */
     public double getBalance() {
         return balance;
+    }
+
+    /**
+     * Gets the budget category of the transaction.
+     *
+     * @return the transaction category
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    /**
+     * Sets the budget category of the transaction.
+     *
+     * @param category the budget category
+     */
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    /**
+     * Sets the budget category of the transaction by name.
+     *
+     * @param categoryName the name of the budget category
+     */
+    public void setCategory(String categoryName) {
+        this.category = categoryName != null ? new Category(categoryName, 0.0) : null;
     }
 }
 

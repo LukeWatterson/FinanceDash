@@ -38,7 +38,7 @@ public class StartupPanel extends JPanel {
     private void initComponents() {
         // --- Header Section ---
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("FinanceDash.FinanceDash Setup & Settings", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("FinanceDash Setup & Settings", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         JLabel subtitleLabel = new JLabel("Configure budget categories and import initial transaction data.", SwingConstants.CENTER);
         subtitleLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -53,7 +53,7 @@ public class StartupPanel extends JPanel {
 
         // Form to add budget category
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Add Budget FinanceDash.Category"));
+        formPanel.setBorder(BorderFactory.createTitledBorder("Add Budget Category"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -62,7 +62,7 @@ public class StartupPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
-        formPanel.add(new JLabel("FinanceDash.Category Name:"), gbc);
+        formPanel.add(new JLabel("Category Name:"), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -87,14 +87,14 @@ public class StartupPanel extends JPanel {
         gbc.gridy = 2;
         gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.EAST;
-        JButton addCategoryButton = new JButton("Add / Update FinanceDash.Category");
+        JButton addCategoryButton = new JButton("Add / Update Category");
         addCategoryButton.addActionListener(e -> onAddCategory());
         formPanel.add(addCategoryButton, gbc);
 
         centerPanel.add(formPanel, BorderLayout.NORTH);
 
         // Table for displaying existing categories
-        String[] columnNames = {"FinanceDash.Category Name", "Monthly Max Amount"};
+        String[] columnNames = {"Category Name", "Monthly Max Amount"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -109,7 +109,7 @@ public class StartupPanel extends JPanel {
 
         // Delete button below table
         JPanel tableActionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton deleteCategoryButton = new JButton("Delete Selected FinanceDash.Category");
+        JButton deleteCategoryButton = new JButton("Delete Selected Category");
         deleteCategoryButton.addActionListener(e -> onDeleteCategory());
         tableActionsPanel.add(deleteCategoryButton);
 
@@ -201,7 +201,7 @@ public class StartupPanel extends JPanel {
 
         categoryNameField.setText("");
         monthlyMaxField.setText("");
-        statusLabel.setText("FinanceDash.Category '" + name + "' added/updated with monthly max £" + String.format("%.2f", maxAmount) + ".");
+        statusLabel.setText("Category '" + name + "' added/updated with monthly max £" + String.format("%.2f", maxAmount) + ".");
     }
 
     private void onDeleteCategory() {
@@ -216,7 +216,7 @@ public class StartupPanel extends JPanel {
             JOptionPane.showMessageDialog(
                     this,
                     "Default category '" + categoryName + "' cannot be deleted.",
-                    "Delete FinanceDash.Category",
+                    "Delete Category",
                     JOptionPane.WARNING_MESSAGE
             );
             return;
@@ -232,13 +232,13 @@ public class StartupPanel extends JPanel {
         if (confirm == JOptionPane.YES_OPTION) {
             DBM.deleteCategory(categoryName);
             loadCategories();
-            statusLabel.setText("FinanceDash.Category '" + categoryName + "' deleted.");
+            statusLabel.setText("Category '" + categoryName + "' deleted.");
         }
     }
 
     private void onImportCsv() {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Select FinanceDash.Transaction CSV File");
+        fileChooser.setDialogTitle("Select Transaction CSV File");
         fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files (*.csv)", "csv"));
 
         // Default to current working directory

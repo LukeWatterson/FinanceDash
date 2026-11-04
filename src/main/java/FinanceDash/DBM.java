@@ -103,6 +103,7 @@ public class DBM {
         String sql = "CREATE TABLE IF NOT EXISTS transactions (\n"
                 + "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                 + "    date TEXT,\n"
+                + "    type TEXT,\n"
                 + "    description TEXT,\n"
                 + "    paid_out REAL,\n"
                 + "    paid_in REAL,\n"
@@ -378,7 +379,8 @@ public class DBM {
     /**
      * Inserts a single {@link Transaction} into the specified database.
      *
-     * @param dbName      database file name or path
+     * @param dbName      database file name or p
+ath
      * @param transaction the transaction to insert
      */
     public static void insertTransaction(String dbName, Transaction transaction) {
@@ -401,15 +403,16 @@ public class DBM {
         if (conn == null || transaction == null) {
             return;
         }
-        String sql = "INSERT INTO transactions (date, description, paid_out, paid_in, balance, category) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO transactions (date, type,description, paid_out, paid_in, balance, category) VALUES (?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, transaction.getDate());
-            pstmt.setString(2, transaction.getDescription());
-            pstmt.setDouble(3, transaction.getPaidOut());
-            pstmt.setDouble(4, transaction.getPaidIn());
-            pstmt.setDouble(5, transaction.getBalance());
-            String cat = transaction.getCategory() != null ? transaction.getCategory().getName() : (transaction.getType() != null ? transaction.getType().toString() : null);
-            pstmt.setString(6, cat);
+            pstmt.setString(2, transaction.getType().toString());
+            pstmt.setString(3, transaction.getDescription());
+            pstmt.setDouble(4, transaction.getPaidOut());
+            pstmt.setDouble(5, transaction.getPaidIn());
+            pstmt.setDouble(6, transaction.getBalance());
+            String cat = transaction.getCategory() != null ? transaction.getCategory().getName() : null;
+            pstmt.setString(7, cat);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error inserting transaction: " + e.getMessage());
@@ -420,14 +423,15 @@ public class DBM {
      * Inserts a single transaction record with individual column values into the default database.
      *
      * @param date        the date of the transaction
+     * @param type        the type of the transaction
      * @param description the description or narrative of the transaction
      * @param paidOut     the amount paid out
      * @param paidIn      the amount paid in
      * @param balance     the account balance
-     * @param category    the category or type of the transaction
+     * @param category    the category of the transaction
      */
-    public static void insertTransaction(String date, String description, double paidOut, double paidIn, double balance, String category) {
-        insertTransaction(DEFAULT_DB_NAME, date, description, paidOut, paidIn, balance, category);
+    public static void insertTransaction(String date,String type, String description, double paidOut, double paidIn, double balance, String category) {
+        insertTransaction(DEFAULT_DB_NAME, date, type, description, paidOut, paidIn, balance, category);
     }
 
     /**
@@ -435,17 +439,18 @@ public class DBM {
      *
      * @param dbName      database file name or path
      * @param date        the date of the transaction
+     * @param type        the type of the transaction
      * @param description the description or narrative of the transaction
      * @param paidOut     the amount paid out
      * @param paidIn      the amount paid in
      * @param balance     the account balance
      * @param category    the category or type of the transaction
      */
-    public static void insertTransaction(String dbName, String date, String description, double paidOut, double paidIn, double balance, String category) {
+    public static void insertTransaction(String dbName, String date, String type, String description, double paidOut, double paidIn, double balance, String category) {
         String url = "jdbc:sqlite:" + dbName;
         try (Connection conn = DriverManager.getConnection(url)) {
             createTransactionsTable(conn);
-            insertTransaction(conn, date, description, paidOut, paidIn, balance, category);
+            insertTransaction(conn, date, type, description, paidOut, paidIn, balance, category);
         } catch (SQLException e) {
             System.err.println("Error connecting or inserting transaction: " + e.getMessage());
         }
@@ -456,24 +461,27 @@ public class DBM {
      *
      * @param conn        existing database connection
      * @param date        the date of the transaction
+     * @param type        the type of the transaction
      * @param description the description or narrative of the transaction
      * @param paidOut     the amount paid out
      * @param paidIn      the amount paid in
      * @param balance     the account balance
      * @param category    the category or type of the transaction
      */
-    public static void insertTransaction(Connection conn, String date, String description, double paidOut, double paidIn, double balance, String category) {
+    public static void insertTransaction(Connection conn, String date, String type, String description, double paidOut, double paidIn, double balance, String category) {
         if (conn == null) {
             return;
         }
-        String sql = "INSERT INTO transactions (date, description, paid_out, paid_in, balance, category) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO transactions (date, type, description, paid_out, paid_in, balance, category) VALUES (?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, date);
-            pstmt.setString(2, description);
-            pstmt.setDouble(3, paidOut);
-            pstmt.setDouble(4, paidIn);
-            pstmt.setDouble(5, balance);
-            pstmt.setString(6, category);
+            pstmt.setString(2, type);
+            pstmt.setString(3, description);
+            pstmt.setDouble(4, paidOut
+);
+            pstmt.setDouble(5, paidIn);
+            pstmt.setDouble(6, balance);
+            pstmt.setString(7, category);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error inserting transaction: " + e.getMessage());
@@ -516,7 +524,7 @@ public class DBM {
         if (conn == null || transactions == null || transactions.isEmpty()) {
             return;
         }
-        String sql = "INSERT INTO transactions (date, description, paid_out, paid_in, balance, category) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO transactions (date, type, description, paid_out, paid_in, balance, category) VALUES (?, ?, ?, ?, ?, ?, ?);";
         boolean autoCommitOriginal = true;
         try {
             autoCommitOriginal = conn.getAutoCommit();
@@ -528,12 +536,13 @@ public class DBM {
                         continue;
                     }
                     pstmt.setString(1, transaction.getDate());
-                    pstmt.setString(2, transaction.getDescription());
-                    pstmt.setDouble(3, transaction.getPaidOut());
-                    pstmt.setDouble(4, transaction.getPaidIn());
-                    pstmt.setDouble(5, transaction.getBalance());
-                    String cat = transaction.getCategory() != null ? transaction.getCategory().getName() : (transaction.getType() != null ? transaction.getType().toString() : null);
-                    pstmt.setString(6, cat);
+                    pstmt.setString(2, transaction.getType().toString());
+                    pstmt.setString(3, transaction.getDescription());
+                    pstmt.setDouble(4, transaction.getPaidOut());
+                    pstmt.setDouble(5, transaction.getPaidIn());
+                    pstmt.setDouble(6, transaction.getBalance());
+                    String category = transaction.getCategory() != null ? transaction.getCategory().getName() : null;
+                    pstmt.setString(7, category);
                     pstmt.addBatch();
                 }
                 pstmt.executeBatch();
@@ -652,11 +661,12 @@ public class DBM {
             return transactions;
         }
         createTransactionsTable(conn);
-        String sql = "SELECT date, description, paid_out, paid_in, balance, category FROM transactions ORDER BY id ASC;";
+        String sql = "SELECT date, type, description, paid_out, paid_in, balance, category FROM transactions ORDER BY id ASC;";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 String date = rs.getString("date");
+                String type = rs.getString("type");
                 String description = rs.getString("description");
                 double paidOut = rs.getDouble("paid_out");
                 double paidIn = rs.getDouble("paid_in");
@@ -667,23 +677,7 @@ public class DBM {
                 String paidInStr = paidIn > 0 ? String.format(Locale.ENGLISH, "%.2f", paidIn) : "";
                 String balanceStr = String.format(Locale.ENGLISH, "%.2f", balance);
 
-                // Determine type from category or default
-                String typeStr = "Contactless Payment";
-                if (category != null && !category.isEmpty()) {
-                    try {
-                        Type parsedType = Type.fromString(category);
-                        typeStr = parsedType.toString();
-                    } catch (IllegalArgumentException ignored) {
-                        typeStr = category;
-                    }
-                }
-
-                Transaction tx;
-                try {
-                    tx = new Transaction(date, typeStr, description, paidOutStr, paidInStr, balanceStr, category);
-                } catch (IllegalArgumentException e) {
-                    tx = new Transaction(date, "Contactless Payment", description, paidOutStr, paidInStr, balanceStr, category);
-                }
+                Transaction tx = new Transaction(date, type, description, paidOutStr, paidInStr, balanceStr, category);
                 transactions.add(tx);
             }
         } catch (SQLException e) {

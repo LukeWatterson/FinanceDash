@@ -1,34 +1,49 @@
-**Finance dashboard to view transactions and view monthly budgets**
-Features:
-  - Add transactions via .csv file import
-  - add custom categories and budgets
-  - automatically categorize transactions on import, manual categorization dialog for unknown transactions
-  - filter and search transactions
-  - view reports on spending and budgeting
+# FinanceDash
 
+A finance dashboard to view transactions and monthly budgets.
 
-**project still in development**
+**Project still in development.**
 
-To run **Java 27 JDK** required:
+## Features
+
+- Add transactions via `.csv` file import
+- Add custom categories and budgets
+- Automatically categorise transactions on import, with a manual categorisation dialog for unknown transactions
+- Filter and search transactions
+- View reports on spending and budgeting
+
+## Requirements
+
+- **Java 27 JDK** or newer (check with `java -version`)
+- Git
+
+## Build and run
 
 **macOS / Linux (Terminal):**
 
-  git clone github.com/LukeWatterson/FinanceDash FinanceDash
-  cd FinanceDash
-  ./mvnw package
-  java -jar target/myapp-1.0.jar
+```
+git clone https://github.com/LukeWatterson/FinanceDash.git
+cd FinanceDash
+./mvnw package
+java -jar target/myapp-1.0.jar
+```
 
 **Windows, Command Prompt:**
 
-  git clone github.com/LukeWatterson/FinanceDash FinanceDash
-  cd FinanceDash
-  mvnw.cmd package
-  java -jar target\myapp-1.0.jar
+```
+git clone https://github.com/LukeWatterson/FinanceDash.git
+cd FinanceDash
+mvnw.cmd package
+java -jar target\myapp-1.0.jar
+```
 
 **Windows, PowerShell:**
 
-  git clone github.com/LukeWatterson/FinanceDash FinanceDash
-  cd FinanceDash
-  .\mvnw.cmd package
-  java -jar target\myapp-1.0.jar
-  
+```
+git clone https://github.com/LukeWatterson/FinanceDash.git
+cd FinanceDash
+.\mvnw.cmd package
+java -jar target\myapp-1.0.jar
+```
+
+The app creates a `finance.db` file in the folder you run it from.

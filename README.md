@@ -13,21 +13,22 @@ To run **Java 27 JDK** required:
 
 **macOS / Linux (Terminal):**
 
-git clone <repo-url> test-clone
-cd test-clone
-./mvnw package
-java -jar target/<name>.jar
+  git clone github.com/LukeWatterson/FinanceDash FinanceDash
+  cd FinanceDash
+  ./mvnw package
+  java -jar target/myapp-1.0.jar
 
 **Windows, Command Prompt:**
 
-git clone <repo-url> test-clone
-cd test-clone
-mvnw.cmd package
-java -jar target\<name>.jar
-**
-Windows, PowerShell:**
+  git clone github.com/LukeWatterson/FinanceDash FinanceDash
+  cd FinanceDash
+  mvnw.cmd package
+  java -jar target\myapp-1.0.jar
 
-git clone <repo-url> test-clone
-cd test-clone
-.\mvnw.cmd package
-java -jar target\<name>.jar
+**Windows, PowerShell:**
+
+  git clone github.com/LukeWatterson/FinanceDash FinanceDash
+  cd FinanceDash
+  .\mvnw.cmd package
+  java -jar target\myapp-1.0.jar
+  

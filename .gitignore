@@ -3,6 +3,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .kotlin
+target/
+.idea/
+*.iml
 
 ### Eclipse ###
 .apt_generated
@@ -33,4 +36,5 @@ bin/
 .csv
 .sqlite
 .db
-keywords.txt
+src/main/resources/keywords.txt
+/dependency-reduced-pom.xml

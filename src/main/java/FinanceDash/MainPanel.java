@@ -33,7 +33,7 @@ public class MainPanel extends JPanel {
     private JLabel countLabel;
 
     public static final String[] COLUMN_NAMES = {
-            "Date", "Type", "Description", "Paid Out (£)", "Paid In (£)", "Balance (£)"
+            "Date", "FinanceDash.Type", "Description", "Paid Out (£)", "Paid In (£)", "Balance (£)"
     };
 
     private static final SimpleDateFormat[] DATE_FORMATS = new SimpleDateFormat[]{
@@ -61,7 +61,7 @@ public class MainPanel extends JPanel {
         // --- Top Bar with Title and Settings Button ---
         JPanel topBar = new JPanel(new BorderLayout());
 
-        JLabel titleLabel = new JLabel("FinanceDash");
+        JLabel titleLabel = new JLabel("FinanceDash.FinanceDash");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         topBar.add(titleLabel, BorderLayout.WEST);
 
@@ -135,7 +135,7 @@ public class MainPanel extends JPanel {
         gbc.gridx = 4;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
-        sortColumnComboBox = new JComboBox<>(new String[]{"Date", "Paid In", "Paid Out", "Balance", "Description", "Type / Category"});
+        sortColumnComboBox = new JComboBox<>(new String[]{"Date", "Paid In", "Paid Out", "Balance", "Description", "FinanceDash.Type / FinanceDash.Category"});
         sortColumnComboBox.addActionListener(e -> applySort());
         controlPanel.add(sortColumnComboBox, gbc);
 
@@ -304,7 +304,7 @@ public class MainPanel extends JPanel {
 
         int columnIndex = switch (columnChoice) {
             case "Date" -> 0;
-            case "Type / Category" -> 1;
+            case "FinanceDash.Type / FinanceDash.Category" -> 1;
             case "Description" -> 2;
             case "Paid Out" -> 3;
             case "Paid In" -> 4;

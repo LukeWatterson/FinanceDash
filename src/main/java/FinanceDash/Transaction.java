@@ -14,7 +14,7 @@ public class Transaction {
     private Category category;
 
     /**
-     * Constructs a new {@code Transaction} with the specified details.
+     * Constructs a new {@code FinanceDash.Transaction} with the specified details.
      * Numeric strings (paidOut, paidIn, balance) may include currency symbols (e.g. '£')
      * or be empty, in which case they default to 0.
      *
@@ -30,7 +30,7 @@ public class Transaction {
     }
 
     /**
-     * Constructs a new {@code Transaction} with the specified details including a budget category.
+     * Constructs a new {@code FinanceDash.Transaction} with the specified details including a budget category.
      *
      * @param date        the date of the transaction
      * @param type        the string representation of the transaction type
@@ -67,7 +67,7 @@ public class Transaction {
     }
 
     /**
-     * Constructs a new {@code Transaction} with the specified details including a budget category name.
+     * Constructs a new {@code FinanceDash.Transaction} with the specified details including a budget category name.
      *
      * @param date         the date of the transaction
      * @param type         the string representation of the transaction type

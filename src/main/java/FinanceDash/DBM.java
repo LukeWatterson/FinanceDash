@@ -754,7 +754,7 @@ public class DBM {
             pstmt.setString(1, category.getName());
             pstmt.setDouble(2, category.getMonthlyMaxAmount());
             pstmt.executeUpdate();
-            System.out.println("Category saved: " + category.getName());
+            System.out.println("FinanceDash.Category saved: " + category.getName());
         } catch (SQLException e) {
             System.err.println("Error inserting category: " + e.getMessage());
         }
@@ -850,7 +850,7 @@ public class DBM {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.executeUpdate();
-            System.out.println("Category deleted: " + name);
+            System.out.println("FinanceDash.Category deleted: " + name);
         } catch (SQLException e) {
             System.err.println("Error deleting category: " + e.getMessage());
         }

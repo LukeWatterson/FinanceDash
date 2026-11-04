@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class Categoriser {
 
-    public static final String DEFAULT_KEYWORDS_FILE = "keywords.txt";
+    public static final String DEFAULT_KEYWORDS_FILE = "src/main/resources/keywords.txt";
     private static String keywordsFilePath = DEFAULT_KEYWORDS_FILE;
 
     private static List<Category> categories;

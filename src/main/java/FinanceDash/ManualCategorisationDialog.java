@@ -101,9 +101,9 @@ public class ManualCategorisationDialog extends JDialog {
 
         // Header Panel
         JPanel headerPanel = new JPanel(new BorderLayout(5, 5));
-        titleLabel = new JLabel("Categorise Transaction", SwingConstants.CENTER);
+        titleLabel = new JLabel("Categorise FinanceDash.Transaction", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        progressLabel = new JLabel("Transaction 1 of " + uncategorisedQueue.size(), SwingConstants.CENTER);
+        progressLabel = new JLabel("FinanceDash.Transaction 1 of " + uncategorisedQueue.size(), SwingConstants.CENTER);
         progressLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         progressLabel.setForeground(Color.DARK_GRAY);
 
@@ -111,10 +111,10 @@ public class ManualCategorisationDialog extends JDialog {
         headerPanel.add(progressLabel, BorderLayout.SOUTH);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Center Panel (Transaction details card)
+        // Center Panel (FinanceDash.Transaction details card)
         JPanel detailsPanel = new JPanel(new GridLayout(4, 2, 8, 8));
         detailsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Transaction Details"),
+                BorderFactory.createTitledBorder("FinanceDash.Transaction Details"),
                 new EmptyBorder(8, 12, 8, 12)
         ));
 
@@ -143,11 +143,11 @@ public class ManualCategorisationDialog extends JDialog {
         // Bottom Panel (Buttons: Categories + Actions)
         JPanel bottomContainer = new JPanel(new BorderLayout(10, 10));
 
-        JLabel promptLabel = new JLabel("Assign a Category (its description will be remembered):", SwingConstants.CENTER);
+        JLabel promptLabel = new JLabel("Assign a FinanceDash.Category (its description will be remembered):", SwingConstants.CENTER);
         promptLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         bottomContainer.add(promptLabel, BorderLayout.NORTH);
 
-        // Category Buttons Panel
+        // FinanceDash.Category Buttons Panel
         categoryButtonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 8));
         categoryButtons.clear();
         for (Category cat : categories) {
@@ -194,7 +194,7 @@ public class ManualCategorisationDialog extends JDialog {
         }
 
         Transaction tx = uncategorisedQueue.get(currentIndex);
-        progressLabel.setText("Transaction " + (currentIndex + 1) + " of " + uncategorisedQueue.size());
+        progressLabel.setText("FinanceDash.Transaction " + (currentIndex + 1) + " of " + uncategorisedQueue.size());
         dateValueLabel.setText(tx.getDate() != null ? tx.getDate() : "");
         descValueLabel.setText(tx.getDescription() != null ? tx.getDescription() : "");
 

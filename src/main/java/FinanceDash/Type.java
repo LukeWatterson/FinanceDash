@@ -35,17 +35,17 @@ public enum Type {
     PAYMENT_TO;
 
     /**
-     * Parses a string and returns the corresponding {@code Type} enum constant.
+     * Parses a string and returns the corresponding {@code FinanceDash.Type} enum constant.
      * The input string is normalized by trimming leading and trailing whitespace,
      * removing double quotes, converting to uppercase, and replacing spaces with underscores.
      *
      * @param input the string representing the transaction type
-     * @return the matching {@code Type}
+     * @return the matching {@code FinanceDash.Type}
      * @throws IllegalArgumentException if {@code input} is {@code null} or does not match any known transaction type
      */
     public static Type fromString(String input) {
         if (input == null) {
-            throw new IllegalArgumentException("Type string cannot be null");
+            throw new IllegalArgumentException("FinanceDash.Type string cannot be null");
         }
 
         String normalized = input
@@ -62,7 +62,7 @@ public enum Type {
             case "DIRECT_DEBIT" -> DIRECT_DEBIT;
             case "PAYMENT_TO" -> PAYMENT_TO;
             default ->
-                    throw new IllegalArgumentException("Unknown Type: '" + input + "' (normalized as '" + normalized + "')");
+                    throw new IllegalArgumentException("Unknown FinanceDash.Type: '" + input + "' (normalized as '" + normalized + "')");
         };
     }
 

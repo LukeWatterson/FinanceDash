@@ -33,7 +33,7 @@ public class Category {
     }
 
     /**
-     * Checks if a Category instance represents one of the default categories.
+     * Checks if a FinanceDash.Category instance represents one of the default categories.
      *
      * @param category category to check
      * @return true if default category, false otherwise
@@ -43,10 +43,10 @@ public class Category {
     }
 
     /**
-     * Gets a default category by name or creates a new Category instance.
+     * Gets a default category by name or creates a new FinanceDash.Category instance.
      *
      * @param name category name
-     * @return Category instance
+     * @return FinanceDash.Category instance
      */
     public static Category get(String name) {
         if (name == null) return null;
@@ -59,21 +59,21 @@ public class Category {
     }
 
     /**
-     * Constructs a new {@code Category} with the specified name and monthly maximum amount.
+     * Constructs a new {@code FinanceDash.Category} with the specified name and monthly maximum amount.
      *
      * @param name             the name of the category (e.g. "Transport")
      * @param monthlyMaxAmount the monthly maximum budget amount (e.g. 60.0)
      */
     public Category(String name, double monthlyMaxAmount) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Category name cannot be null or empty");
+            throw new IllegalArgumentException("FinanceDash.Category name cannot be null or empty");
         }
         this.name = name.trim();
         this.monthlyMaxAmount = monthlyMaxAmount;
     }
 
     /**
-     * Constructs a new {@code Category} with the specified name and string representation of the monthly amount.
+     * Constructs a new {@code FinanceDash.Category} with the specified name and string representation of the monthly amount.
      * Strips currency symbols (such as '£', '$', '€') and whitespace.
      *
      * @param name                  the name of the category
@@ -81,7 +81,7 @@ public class Category {
      */
     public Category(String name, String monthlyMaxAmountStr) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Category name cannot be null or empty");
+            throw new IllegalArgumentException("FinanceDash.Category name cannot be null or empty");
         }
         this.name = name.trim();
         this.monthlyMaxAmount = parseAmount(monthlyMaxAmountStr);
@@ -111,7 +111,7 @@ public class Category {
      */
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Category name cannot be null or empty");
+            throw new IllegalArgumentException("FinanceDash.Category name cannot be null or empty");
         }
         this.name = name.trim();
     }

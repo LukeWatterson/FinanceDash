@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Main application window and entry point for the FinanceDash application.
+ * Main application window and entry point for the FinanceDash.FinanceDash application.
  * Extends {@link JFrame} to provide the graphical user interface.
  */
 public class FinanceDash extends JFrame {
@@ -18,11 +18,11 @@ public class FinanceDash extends JFrame {
     private final MainPanel mainPanel;
 
     /**
-     * Constructs a new {@code FinanceDash} frame, sets the window title,
+     * Constructs a new {@code FinanceDash.FinanceDash} frame, sets the window title,
      * initializes the database, and loads the initial panel based on first-launch status.
      */
     public FinanceDash() {
-        setTitle("FinanceDash");
+        setTitle("FinanceDash.FinanceDash");
 
         DBM.initializeDatabase();
 
@@ -69,7 +69,7 @@ public class FinanceDash extends JFrame {
     }
 
     /**
-     * Entry point for running the FinanceDash application.
+     * Entry point for running the FinanceDash.FinanceDash application.
      * Initializes and displays the main application window sized to the full screen.
      */
     public static void main() {
@@ -77,7 +77,7 @@ public class FinanceDash extends JFrame {
     }
 
     /**
-     * Standard entry point for running the FinanceDash application.
+     * Standard entry point for running the FinanceDash.FinanceDash application.
      *
      * @param args command-line arguments
      */

@@ -6,8 +6,57 @@ import java.util.Objects;
  * Represents a budget category with a name and a monthly maximum budget amount.
  */
 public class Category {
+    public static final Category FOOD = new Category("Food", 0.0);
+    public static final Category TRANSPORT = new Category("Transport", 0.0);
+    public static final Category ENTERTAINMENT = new Category("Entertainment", 0.0);
+    public static final Category EXTRAS = new Category("Extras", 0.0);
+
+    public static final java.util.List<Category> DEFAULT_CATEGORIES = java.util.List.of(FOOD, TRANSPORT, ENTERTAINMENT, EXTRAS);
+
     private String name;
     private double monthlyMaxAmount;
+
+    /**
+     * Checks if a category name matches one of the default categories.
+     *
+     * @param name category name
+     * @return true if default category, false otherwise
+     */
+    public static boolean isDefaultCategory(String name) {
+        if (name == null) return false;
+        for (Category def : DEFAULT_CATEGORIES) {
+            if (def.getName().equalsIgnoreCase(name.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a Category instance represents one of the default categories.
+     *
+     * @param category category to check
+     * @return true if default category, false otherwise
+     */
+    public static boolean isDefaultCategory(Category category) {
+        return category != null && isDefaultCategory(category.getName());
+    }
+
+    /**
+     * Gets a default category by name or creates a new Category instance.
+     *
+     * @param name category name
+     * @return Category instance
+     */
+    public static Category get(String name) {
+        if (name == null) return null;
+        for (Category def : DEFAULT_CATEGORIES) {
+            if (def.getName().equalsIgnoreCase(name.trim())) {
+                return def;
+            }
+        }
+        return new Category(name.trim(), 0.0);
+    }
 
     /**
      * Constructs a new {@code Category} with the specified name and monthly maximum amount.

@@ -33,7 +33,7 @@ public class MainPanel extends JPanel {
     private JLabel countLabel;
 
     public static final String[] COLUMN_NAMES = {
-            "Date", "Type / Category", "Description", "Paid Out (£)", "Paid In (£)", "Balance (£)"
+            "Date", "Type", "Description", "Paid Out (£)", "Paid In (£)", "Balance (£)"
     };
 
     private static final SimpleDateFormat[] DATE_FORMATS = new SimpleDateFormat[]{

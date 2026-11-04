@@ -212,6 +212,16 @@ public class StartupPanel extends JPanel {
         }
 
         String categoryName = (String) tableModel.getValueAt(selectedRow, 0);
+        if (Category.isDefaultCategory(categoryName)) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Default category '" + categoryName + "' cannot be deleted.",
+                    "Delete Category",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
         int confirm = JOptionPane.showConfirmDialog(
                 this,
                 "Are you sure you want to delete category '" + categoryName + "'?",
@@ -241,11 +251,21 @@ public class StartupPanel extends JPanel {
             if (transactions.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No valid transactions found in selected file.", "Import CSV", JOptionPane.WARNING_MESSAGE);
             } else {
+                int autoCategorizedCount = Categoriser.categorise(transactions);
+                ManualCategorisationDialog.showDialog(this, transactions);
+
+                int totalCategorizedCount = 0;
+                for (Transaction t : transactions) {
+                    if (t != null && t.getCategory() != null && t.getCategory().getName() != null && !t.getCategory().getName().trim().isEmpty()) {
+                        totalCategorizedCount++;
+                    }
+                }
+
                 DBM.insertTransactions(transactions);
                 statusLabel.setText("Successfully imported " + transactions.size() + " transactions from " + selectedFile.getName() + ".");
                 JOptionPane.showMessageDialog(
                         this,
-                        "Successfully imported " + transactions.size() + " transactions into the database.",
+                        "Successfully imported " + transactions.size() + " transactions into the database. And Categorised " + totalCategorizedCount + " transactions.",
                         "Import Successful",
                         JOptionPane.INFORMATION_MESSAGE
                 );

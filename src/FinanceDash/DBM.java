@@ -187,6 +187,15 @@ public class DBM {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
             System.out.println("Table 'categories' is ready (created if it did not exist).");
+
+            // Ensure default categories exist
+            String insertDefaultSql = "INSERT OR IGNORE INTO categories (name, monthly_max) VALUES (?, 0.0);";
+            try (PreparedStatement pstmt = conn.prepareStatement(insertDefaultSql)) {
+                for (Category defaultCat : Category.DEFAULT_CATEGORIES) {
+                    pstmt.setString(1, defaultCat.getName());
+                    pstmt.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             System.err.println("Error creating categories table: " + e.getMessage());
         }
@@ -565,6 +574,7 @@ public class DBM {
     public static void insertFromCSV(String csvFilePath, String dbName) {
         List<Transaction> transactions = readCSV(csvFilePath);
         if (!transactions.isEmpty()) {
+            Categoriser.categorise(transactions);
             insertTransactions(dbName, transactions);
         }
     }
@@ -578,6 +588,7 @@ public class DBM {
     public static void insertFromCSV(Connection conn, String csvFilePath) {
         List<Transaction> transactions = readCSV(csvFilePath);
         if (!transactions.isEmpty()) {
+            Categoriser.categorise(transactions);
             insertTransactions(conn, transactions);
         }
     }
@@ -964,11 +975,7 @@ public class DBM {
      */
     public static boolean isFirstLaunch(String dbName) {
         String val = getSetting(dbName, "first_launch_completed");
-        if ("true".equalsIgnoreCase(val)) {
-            return false;
-        }
-        List<Category> categories = getAllCategories(dbName);
-        return categories.isEmpty();
+        return !"true".equalsIgnoreCase(val);
     }
 
     /**
